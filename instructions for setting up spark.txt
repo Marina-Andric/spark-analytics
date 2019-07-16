@@ -1,0 +1,43 @@
+Instructions for running standalone spark
+
+1. download spark and hadoop
+2. set environment variables SPARK_HOME, HADOOP_HOME
+	on windows: download winutils.exe and put into hadoop bin 
+3. in spark/conf/spark-env. sh add export STANDALONE_SPARK_MASTER_HOST=`hostname`
+
+4. navigate to SPARK_HOME\bin and run spark-clas org.apache.deploy.master.Master
+5. -II- run spark-class org.apache.spark.deploy.worker.Worker spark://ip:port (with url and port from the previous step)
+6. -II- run spark-shell --master spark://ip:port to connect an application 
+
+To use spark with jdbc
+
+1. spark-shell --driver-class-path path_to_jar --jars jar_file
+
+Example with Scala
+2. val jdbcDF = spark.read.format("jdbc").options(Map("url" -> "jdbc:postgresql://localhost:5432/pulse?user=postgres&password=postgres","dbtable" -> "pds_dev.myView", "fetchSize" -> "10000", "partitionColumn" -> "question_id", "lowerBound" -> "1", "upperBound" -> "2000", "numPartitions" -> "8")).load()
+
+3. jdbcDF.createOrReplaceTempView("myView")
+
+6. val sqlDF = sql("select * from myView"); sqlDF.show()
+
+
+Notes
+
+In case of RpcTimeoutException
+spark-submit --conf spark.network.timeout=600s
+
+
+Web UI
+http://10.0.75.1:4040/ (master)
+http://10.0.75.1:4041/ (worker)
+
+
+To exit scala - :q
+
+helpful links: 
+https://github.com/Cheng-Lin-Li/Spark/wiki/How-to-install-Spark-2.1.0-in-Windows-10-environment
+http://damn.amsterdam/sparkonwindows/
+https://docs.databricks.com/spark/latest/data-sources/sql-databases.html
+https://stackoverflow.com/questions/41085238/what-is-the-meaning-of-partitioncolumn-lowerbound-upperbound-numpartitions-pa
+https://logz.io/blog/hadoop-vs-spark/
+
